@@ -14,7 +14,7 @@ Authorization_engine::Authorization_engine(
     Client_ID(Client_ID),
     requirements(requirements)
 {
-
+    user_data_handler = new User_data_handler;
     Code_verifier = generateCodeVerifier();
     //qDebug() << "Code_verifier = " << Code_verifier;
     codeChallenge = QString(createCodeChallenge(Code_verifier));
@@ -66,6 +66,15 @@ void Authorization_engine::POST_request_for_token(const QUrl &url)
 
     QNetworkReply *reply = manager->post(request, postData);
 
+    return;
+}
+
+void Authorization_engine::onSent_user_data_to_handler(QJsonDocument JSON_payload, Validating_JWT* parent_of_signal)
+{
+    user_data_handler->Receive_user_data(JSON_payload);
+
+    disconnect(parent_of_signal, &Validating_JWT::Sent_user_data_to_handler,
+            this, &Authorization_engine::onSent_user_data_to_handler);
     return;
 }
 
@@ -129,6 +138,9 @@ void Authorization_engine::get_POST_RESPONSE_for_token(QNetworkReply *reply)
     }
     auto ans = reply->readAll();
     QJsonDocument doc = QJsonDocument::fromJson(ans);
+    //write_into_QSettings_user_data(doc["access_token"].toString());
+
+    /*
     qDebug() << "below your  JSON payload";
     qDebug() << "access_token: "+ doc["access_token"].toString();
     qDebug() << "access_token: " << doc["expires_in"].toDouble();
@@ -136,10 +148,12 @@ void Authorization_engine::get_POST_RESPONSE_for_token(QNetworkReply *reply)
     qDebug() << "refresh_token: " + doc["refresh_token"].toString();
     qDebug() << "";
     qDebug() << "";
+    */
     disconnect(manager,&QNetworkAccessManager::finished,this,&Authorization_engine::get_POST_RESPONSE_for_token);
 
-
-    Validating_JWT* validating_JWT= new Validating_JWT(manager, doc["access_token"].toString());
+    //Auth_user_data user_data = {"", "", doc["access_token"].toString(), doc["refresh_token"].toString()};
+    //list_of_users.push_back(user_data);
+    Validating_JWT* validating_JWT= new Validating_JWT(manager, doc, this);
 
     /*
     QNetworkAccessManager* manager2 = new QNetworkAccessManager();

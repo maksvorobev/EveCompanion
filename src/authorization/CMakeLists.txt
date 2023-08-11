@@ -9,6 +9,10 @@ target_sources(appEveCompanion
         src/Tcp_server.cpp
         src/Validating_JWT.cpp
         include/Validating_JWT.h
+        include/Auth_user_data.h
+        src/Auth_user_data.cpp
+        src/User_data_handler.cpp
+        include/User_data_handler.h
 )
 
 target_include_directories(appEveCompanion

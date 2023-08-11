@@ -1,13 +1,15 @@
 #include "../include/Validating_JWT.h"
 
-Validating_JWT::Validating_JWT(QNetworkAccessManager *manager, QString access_token):
+Validating_JWT::Validating_JWT(QNetworkAccessManager *manager, QJsonDocument JSON_payload, Authorization_engine* auth_engine):
     manager(manager),
-    access_token(access_token)
+    JSON_payload(JSON_payload),
+    auth_engine(auth_engine)
 {
+    access_token = JSON_payload["access_token"].toString();
     send_GET_request_to_SSO_key_storage();
 }
 
-bool Validating_JWT::veri_jwt_token(QString strToken, QString rsa_pub_key)
+void Validating_JWT::veri_jwt_token(QString strToken, QString rsa_pub_key)
 {
     /*
      * rs 256 jwt token validation
@@ -16,20 +18,29 @@ bool Validating_JWT::veri_jwt_token(QString strToken, QString rsa_pub_key)
     std::string token = strToken.toStdString();
 
 
-    auto verify = jwt::verify().allow_algorithm(jwt::algorithm::rs256(rsa_pub_key.toStdString(), "", "", "")).with_issuer("login.eveonline.com").with_audience("EVE Online");
+    auto verify = jwt::verify().allow_algorithm(jwt::algorithm::rs256(rsa_pub_key.toStdString(), "", "", "")).with_issuer("login.eveonline.com").with_audience("EVE Online").leeway(5);
+    qDebug() << "current unix time : " << (QDateTime::currentMSecsSinceEpoch()/1000);
 
     auto decoded = jwt::decode(token);
-    verify.verify(decoded); // there Validate the JWT tocken (signature, issuer, date, audience), if all will valid nothing will happen, else will thow exapthion
-
+    /*
     qDebug() << "below decoding of your JWT token";
     for (auto& e : decoded.get_header_json())
         qDebug() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
     for (auto& e : decoded.get_payload_json())
         qDebug() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
-    return true;
+    qDebug() << "";
+    qDebug() << "";
+    */
+    verify.verify(decoded); // there Validate the JWT tocken (signature, issuer, date, audience), if all will valid nothing will happen, else will thow exapthion
 
-    qDebug() << "";
-    qDebug() << "";
+
+    // there we want store info about user from auth. after valid verify
+    connect(this, &Validating_JWT::Sent_user_data_to_handler,
+            auth_engine, &Authorization_engine::onSent_user_data_to_handler);
+    emit Sent_user_data_to_handler(JSON_payload, this);
+    return;
+
+
 
 }
 

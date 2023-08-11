@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(OPENSLL_FOR_ANDROID_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third-party-lib/android_openssl/ssl_1.1)
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Quick Network NetworkAuth)
+find_package(Qt6 6.2 REQUIRED COMPONENTS Quick Network NetworkAuth Core)
 
 
 qt_add_executable(appEveCompanion
@@ -18,7 +18,10 @@ qt_add_qml_module(appEveCompanion
     URI EveCompanion
     VERSION 1.0
     QML_FILES Main.qml
+    RESOURCE_PREFIX /maksvorobev/imports
 )
+
+# add_subdirectory(Qml/StyleSettings)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -32,7 +35,7 @@ set_target_properties(appEveCompanion PROPERTIES
 )
 
 target_link_libraries(appEveCompanion
-    PRIVATE Qt6::Quick Qt6::Network Qt6::NetworkAuth
+    PRIVATE Qt6::Quick Qt6::Network Qt6::NetworkAuth Qt6::Core
 )
 
 if (ANDROID)
@@ -83,9 +86,12 @@ else()
     )
 endif()
 
+# target_link_libraries(appEveCompanion PRIVATE Qml.StyleSettingsplugin)
+
 
 target_include_directories(appEveCompanion
     PUBLIC ${OPENSLL_FOR_ANDROID_PATH}/include
+    PUBLIC third-party-lib/nlohmann-json/include
 )
 
 

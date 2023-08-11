@@ -5,6 +5,9 @@
 #include <iostream>
 #include <QQmlContext>
 #include <QSslSocket>
+#include <QtQml/qqmlextensionplugin.h>
+
+//Q_IMPORT_QML_PLUGIN(UriStyleSettingsPlugin)
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -20,7 +23,8 @@ int main(int argc, char *argv[])
     tcp_server->run_Tcp_server();
 
     QQmlApplicationEngine engine;
-    const QUrl url(u"qrc:/EveCompanion/Main.qml"_qs);
+    engine.addImportPath(":/maksvorobev/imports");
+    const QUrl url(u"qrc:/maksvorobev/imports/EveCompanion/Main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
@@ -28,6 +32,7 @@ int main(int argc, char *argv[])
         }, Qt::QueuedConnection);
     engine.rootContext()->setContextObject(A_eng);
     engine.load(url);
+    //engine.load(QUrl(u"qrc:/maksvorobev/imports/Qml.StyleSettings/Style.qml"_qs));
 
     return app.exec();
 }

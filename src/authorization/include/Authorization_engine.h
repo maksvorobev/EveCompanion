@@ -14,6 +14,12 @@
 #include <QUuid>
 #include "Validating_JWT.h"
 #include <QSharedPointer>
+#include <vector>
+#include "Auth_user_data.h"
+#include "User_data_handler.h"
+
+class Validating_JWT;
+
 
 class Authorization_engine : public QObject
 {
@@ -27,6 +33,7 @@ public:
         QObject *parent = nullptr
         );
 private:
+    User_data_handler* user_data_handler;
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     QString Client_ID;
     QUrl Callback_URL = QString("http://localhost:8080/oauth-callback");
@@ -51,6 +58,7 @@ signals:
 
 public slots:
     void get_code(QString code);
+    void onSent_user_data_to_handler(QJsonDocument JSON_payload, Validating_JWT* parent_of_signal);
 protected slots:
     void get_answer(QNetworkReply *reply);
     void get_POST_RESPONSE_for_token(QNetworkReply *reply);
