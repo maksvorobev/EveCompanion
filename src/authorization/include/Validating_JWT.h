@@ -13,7 +13,7 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QDateTime>
-#include "../include/Authorization_engine.h"
+#include "Authorization_engine.h"
 
 
 class Authorization_engine;
@@ -39,7 +39,7 @@ protected slots:
     void get_responce_from_SSO_key_storage(QNetworkReply *reply);
 
 signals:
-    void Sent_user_data_to_handler(QJsonDocument JSON_payload, Validating_JWT* parent_of_signal);
+    void Sent_user_data_to_handler(const QJsonDocument& JSON_payload, Validating_JWT* parent_of_signal);
 };
 
 #endif // VALIDATING_JWT_H

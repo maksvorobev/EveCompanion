@@ -12,7 +12,11 @@ find_package(Qt6 6.2 REQUIRED COMPONENTS Quick Network NetworkAuth Core)
 qt_add_executable(appEveCompanion
     main.cpp
 )
+# SRC subdirectories
 add_subdirectory(src/authorization)
+
+
+
 
 qt_add_qml_module(appEveCompanion
     URI EveCompanion
@@ -20,8 +24,11 @@ qt_add_qml_module(appEveCompanion
     QML_FILES Main.qml
     RESOURCE_PREFIX /maksvorobev/imports
 )
+# QML subdirectories
+add_subdirectory(Qml/StyleSettings)
+add_subdirectory(Qml/Pages)
+add_subdirectory(Qml/CastomButtons)
 
-# add_subdirectory(Qml/StyleSettings)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -86,7 +93,11 @@ else()
     )
 endif()
 
-# target_link_libraries(appEveCompanion PRIVATE Qml.StyleSettingsplugin)
+
+# QML target_link_libraries
+target_link_libraries(appEveCompanion PRIVATE StyleSettingsplugin)
+target_link_libraries(appEveCompanion PRIVATE Pagesplugin)
+target_link_libraries(appEveCompanion PRIVATE CastomButtonsplugin)
 
 
 target_include_directories(appEveCompanion

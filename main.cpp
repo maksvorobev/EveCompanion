@@ -7,7 +7,8 @@
 #include <QSslSocket>
 #include <QtQml/qqmlextensionplugin.h>
 
-//Q_IMPORT_QML_PLUGIN(UriStyleSettingsPlugin)
+Q_IMPORT_QML_PLUGIN(Qml_StyleSettingsPlugin)
+Q_IMPORT_QML_PLUGIN(Qml_PagesPlugin)
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -30,7 +31,9 @@ int main(int argc, char *argv[])
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
         }, Qt::QueuedConnection);
-    engine.rootContext()->setContextObject(A_eng);
+    //engine.rootContext()->setContextObject(A_eng);
+    engine.rootContext()->setContextProperty("Authorization_engine", A_eng);
+    engine.rootContext()->setContextProperty("User_data_handler", A_eng->get_User_data_handler());
     engine.load(url);
     //engine.load(QUrl(u"qrc:/maksvorobev/imports/Qml.StyleSettings/Style.qml"_qs));
 

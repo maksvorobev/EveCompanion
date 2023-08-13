@@ -69,7 +69,7 @@ void Authorization_engine::POST_request_for_token(const QUrl &url)
     return;
 }
 
-void Authorization_engine::onSent_user_data_to_handler(QJsonDocument JSON_payload, Validating_JWT* parent_of_signal)
+void Authorization_engine::onSent_user_data_to_handler(const QJsonDocument& JSON_payload, Validating_JWT* parent_of_signal)
 {
     user_data_handler->Receive_user_data(JSON_payload);
 
@@ -99,6 +99,11 @@ QByteArray Authorization_engine::createCodeChallenge(const QByteArray &Code_veri
 QString Authorization_engine::p_Direct_URL()
 {
     return make_authorization_url().toString();
+}
+
+User_data_handler *Authorization_engine::get_User_data_handler()
+{
+    return user_data_handler;
 }
 
 

@@ -13,4 +13,7 @@ QtObject{
     readonly property int defaultOffset: 15
     readonly property int mediumOffset: 10
     readonly property int tinyOffset: 5
+
+    readonly property int defaultHeaderHeight: 40
+    readonly property int hugeHeaderHeight: 60
 }

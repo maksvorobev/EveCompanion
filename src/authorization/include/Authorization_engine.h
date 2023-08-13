@@ -53,12 +53,13 @@ private:
 
 public:
     QString p_Direct_URL();
+    User_data_handler* get_User_data_handler();
 signals:
 
 
 public slots:
     void get_code(QString code);
-    void onSent_user_data_to_handler(QJsonDocument JSON_payload, Validating_JWT* parent_of_signal);
+    void onSent_user_data_to_handler(const QJsonDocument& JSON_payload, Validating_JWT* parent_of_signal);
 protected slots:
     void get_answer(QNetworkReply *reply);
     void get_POST_RESPONSE_for_token(QNetworkReply *reply);
