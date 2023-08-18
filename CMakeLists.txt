@@ -6,14 +6,15 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(OPENSLL_FOR_ANDROID_PATH ${CMAKE_CURRENT_SOURCE_DIR}/third-party-lib/android_openssl/ssl_1.1)
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Quick Network NetworkAuth Core)
+find_package(Qt6 6.2 REQUIRED COMPONENTS Quick Network NetworkAuth Core Svg Xml Gui)
+
 
 
 qt_add_executable(appEveCompanion
     main.cpp
 )
 # SRC subdirectories
-add_subdirectory(src/authorization)
+add_subdirectory(src)
 
 
 
@@ -25,9 +26,7 @@ qt_add_qml_module(appEveCompanion
     RESOURCE_PREFIX /maksvorobev/imports
 )
 # QML subdirectories
-add_subdirectory(Qml/StyleSettings)
-add_subdirectory(Qml/Pages)
-add_subdirectory(Qml/CastomButtons)
+add_subdirectory(Qml)
 
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -42,7 +41,7 @@ set_target_properties(appEveCompanion PROPERTIES
 )
 
 target_link_libraries(appEveCompanion
-    PRIVATE Qt6::Quick Qt6::Network Qt6::NetworkAuth Qt6::Core
+    PRIVATE Qt6::Quick Qt6::Network Qt6::NetworkAuth Qt6::Core Qt6::Svg Qt6::Xml Qt6::Gui
 )
 
 if (ANDROID)
@@ -93,11 +92,6 @@ else()
     )
 endif()
 
-
-# QML target_link_libraries
-target_link_libraries(appEveCompanion PRIVATE StyleSettingsplugin)
-target_link_libraries(appEveCompanion PRIVATE Pagesplugin)
-target_link_libraries(appEveCompanion PRIVATE CastomButtonsplugin)
 
 
 target_include_directories(appEveCompanion

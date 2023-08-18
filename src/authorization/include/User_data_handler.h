@@ -9,6 +9,14 @@
 #include <QSettings>
 #include <QAnyStringView>
 #include <QObject>
+#include <QScopedPointer>
+#include "../../cppModels/include/MainPageModel.h"
+#include "Authorization_engine.h"
+#include <QEventLoop>
+#include "../../RestRequestManager/include/RestRequestManager.h"
+
+
+class Authorization_engine;
 
 class User_data_handler: public QObject
 {
@@ -17,13 +25,18 @@ class User_data_handler: public QObject
     */
     Q_OBJECT
 public:
-    User_data_handler();
+    User_data_handler(QSharedPointer<QNetworkAccessManager> manager);
     void Receive_user_data(const QJsonDocument& JSON_payload);
     void store_data(const ns_data::Auth_user_data& data);
+    QSharedPointer<MainPageModel> getModel_ptr() const;
+
 signals:
     void pushSecondPage();
 
 private:
-    QSettings* storage;
+    QSharedPointer<QNetworkAccessManager> manager;
+    QScopedPointer<QSettings> storage;
+    QSharedPointer<MainPageModel> model_ptr;
+    void fill_data_for_MainPageModelData();
 };
 

@@ -1,6 +1,6 @@
 #include "../include/Validating_JWT.h"
 
-Validating_JWT::Validating_JWT(QNetworkAccessManager *manager, QJsonDocument JSON_payload, Authorization_engine* auth_engine):
+Validating_JWT::Validating_JWT(QSharedPointer<QNetworkAccessManager> manager, QJsonDocument JSON_payload, Authorization_engine* auth_engine):
     manager(manager),
     JSON_payload(JSON_payload),
     auth_engine(auth_engine)
@@ -82,7 +82,7 @@ QString Validating_JWT::ConvertJwkToPem_V2(const QString& nn, const QString& ee)
 
 void Validating_JWT::send_GET_request_to_SSO_key_storage()
 {
-    connect(manager, &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
+    connect(manager.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
     QNetworkRequest req;
     req.setUrl(SSO_key_storage);
     manager->get(req);
@@ -111,7 +111,7 @@ void Validating_JWT::final_check(const QString& ee, const QString& nn)
 
 void Validating_JWT::get_responce_from_SSO_key_storage(QNetworkReply *reply)
 {
-    disconnect(manager, &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
+    disconnect(manager.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
 
     if (reply->error()) {
         qDebug() << reply->errorString();

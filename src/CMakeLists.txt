@@ -1,0 +1,3 @@
+add_subdirectory(authorization)
+add_subdirectory(cppModels)
+add_subdirectory(RestRequestManager)

@@ -17,9 +17,10 @@
 #include <vector>
 #include "Auth_user_data.h"
 #include "User_data_handler.h"
+#include <QScopedPointer>
 
 class Validating_JWT;
-
+class User_data_handler;
 
 class Authorization_engine : public QObject
 {
@@ -34,7 +35,6 @@ public:
         );
 private:
     User_data_handler* user_data_handler;
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     QString Client_ID;
     QUrl Callback_URL = QString("http://localhost:8080/oauth-callback");
     QString requirements;
@@ -52,10 +52,12 @@ private:
     QByteArray createCodeChallenge(const QByteArray& Code_verifier);
 
 public:
+    QSharedPointer<QNetworkAccessManager> manager = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(this));
     QString p_Direct_URL();
-    User_data_handler* get_User_data_handler();
+    //User_data_handler* get_User_data_handler();
+    QSharedPointer<MainPageModel> getModel_ptr() const;
 signals:
-
+    void laod_main_page_in_qml();
 
 public slots:
     void get_code(QString code);

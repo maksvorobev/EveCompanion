@@ -1,0 +1,8 @@
+add_subdirectory(StyleSettings)
+add_subdirectory(Pages)
+add_subdirectory(CastomButtons)
+
+
+target_link_libraries(appEveCompanion PRIVATE StyleSettingsplugin)
+target_link_libraries(appEveCompanion PRIVATE Pagesplugin)
+target_link_libraries(appEveCompanion PRIVATE CastomButtonsplugin)

@@ -22,7 +22,7 @@ class Validating_JWT: public QObject
 {
     Q_OBJECT
 public:
-    Validating_JWT(QNetworkAccessManager *manager, QJsonDocument JSON_payload, Authorization_engine* auth_engine);
+    Validating_JWT(QSharedPointer<QNetworkAccessManager> manager, QJsonDocument JSON_payload, Authorization_engine* auth_engine);
 private:
     QJsonDocument JSON_payload;
     Authorization_engine* auth_engine;
@@ -30,7 +30,7 @@ private:
     void extract_nn_and_ee(const QByteArray& answer);
     void final_check(const QString& ee, const QString& nn);
     QUrl SSO_key_storage = QUrl("https://login.eveonline.com/oauth/jwks");
-    QNetworkAccessManager *manager;
+    QSharedPointer<QNetworkAccessManager> manager;
     void send_GET_request_to_SSO_key_storage();
     QString ConvertJwkToPem_V2(const QString& nn, const QString& ee);
     void veri_jwt_token(QString strToken, QString rsa_pub_key);

@@ -16,4 +16,6 @@ QtObject{
 
     readonly property int defaultHeaderHeight: 40
     readonly property int hugeHeaderHeight: 60
+
+    readonly property int defaultIconWidth: 40
 }

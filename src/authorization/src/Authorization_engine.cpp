@@ -14,7 +14,7 @@ Authorization_engine::Authorization_engine(
     Client_ID(Client_ID),
     requirements(requirements)
 {
-    user_data_handler = new User_data_handler;
+    user_data_handler = new User_data_handler(manager);
     Code_verifier = generateCodeVerifier();
     //qDebug() << "Code_verifier = " << Code_verifier;
     codeChallenge = QString(createCodeChallenge(Code_verifier));
@@ -56,7 +56,7 @@ void Authorization_engine::POST_request_for_token(const QUrl &url)
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRawHeader("Host", "login.eveonline.com");
 
-    connect(manager,&QNetworkAccessManager::finished,this,&Authorization_engine::get_POST_RESPONSE_for_token);
+    connect(manager.get(),&QNetworkAccessManager::finished,this,&Authorization_engine::get_POST_RESPONSE_for_token);
 
     QByteArray postData; // payload
     postData.append("grant_type=authorization_code");
@@ -75,6 +75,8 @@ void Authorization_engine::onSent_user_data_to_handler(const QJsonDocument& JSON
 
     disconnect(parent_of_signal, &Validating_JWT::Sent_user_data_to_handler,
             this, &Authorization_engine::onSent_user_data_to_handler);
+    emit laod_main_page_in_qml();
+
     return;
 }
 
@@ -101,9 +103,16 @@ QString Authorization_engine::p_Direct_URL()
     return make_authorization_url().toString();
 }
 
+/*
 User_data_handler *Authorization_engine::get_User_data_handler()
 {
     return user_data_handler;
+}
+*/
+
+QSharedPointer<MainPageModel> Authorization_engine::getModel_ptr() const
+{
+    return user_data_handler->getModel_ptr();
 }
 
 
@@ -154,27 +163,30 @@ void Authorization_engine::get_POST_RESPONSE_for_token(QNetworkReply *reply)
     qDebug() << "";
     qDebug() << "";
     */
-    disconnect(manager,&QNetworkAccessManager::finished,this,&Authorization_engine::get_POST_RESPONSE_for_token);
+    disconnect(manager.get(),&QNetworkAccessManager::finished,this,&Authorization_engine::get_POST_RESPONSE_for_token);
 
     //Auth_user_data user_data = {"", "", doc["access_token"].toString(), doc["refresh_token"].toString()};
     //list_of_users.push_back(user_data);
     Validating_JWT* validating_JWT= new Validating_JWT(manager, doc, this);
 
-    /*
-    QNetworkAccessManager* manager2 = new QNetworkAccessManager();
-    QNetworkRequest request(QUrl("https://esi.evetech.net/latest/characters/id/wallet/"));
-    request.setRawHeader("Authorization", (QString("Bearer ") + doc["access_token"].toString()).toUtf8());
 
+    //QNetworkAccessManager* manager2 = new QNetworkAccessManager();
+    //QNetworkRequest request(QUrl("https://esi.evetech.net/latest/characters/2114312667/portrait/"));
+    //request.setRawHeader("Authorization", (QString("Bearer ") + doc["access_token"].toString()).toUtf8());
+
+    /*
     QNetworkReply* replyy = manager2->get(request);
     QObject::connect(manager2, &QNetworkAccessManager::finished, [](QNetworkReply *reply) {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray responseData = reply->readAll();
-            qDebug() << "OJOJI;" << responseData;
+            QJsonDocument doc = QJsonDocument::fromJson(responseData);
+            qDebug() << "OJOJI;" << doc;
         } else {
             qDebug() << "Error: " << reply->errorString();
         }
     });
     */
+
 
     reply->deleteLater();
     return;

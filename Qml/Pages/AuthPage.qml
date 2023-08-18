@@ -21,12 +21,18 @@ Rectangle{
             ButtonPageEvent {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                button_width: 60
-                button_image_url: "data/imgs/879374.png"
+                button_width: Style.defaultIconWidth
+                button_image_url: main_root.is_dark ?  "data/imgs/left-arrow-white.svg" : "data/imgs/left-arrow-black.svg"
                 onClicked:{
-                    var component = Qt.createComponent("MainPage.qml");
-                    sprite = component.createObject(root);
-                    console.log("smth");
+                    var component = Qt.createComponent("MainPage/MainPage.qml");
+                    if( component.status != Component.Ready )
+                    {
+                        if( component.status == Component.Error )
+                            console.debug("Error:"+ component.errorString() );
+                        return; // or maybe throw
+                    }
+                    component.createObject(root);
+                    console.log("create MainPage.qml");
                 }
             }
         }
@@ -60,5 +66,19 @@ Rectangle{
             }
         }
 
+    }
+    Connections {
+        target: Authorization_engine
+        onLaod_main_page_in_qml: {
+            var component = Qt.createComponent("MainPage/MainPage.qml");
+            if( component.status != Component.Ready )
+            {
+                if( component.status == Component.Error )
+                    console.debug("Error:"+ component.errorString() );
+                return; // or maybe throw
+            }
+            component.createObject(root);
+            console.log("create MainPage.qml");
+        }
     }
 }
