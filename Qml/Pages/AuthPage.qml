@@ -67,6 +67,7 @@ Rectangle{
         }
 
     }
+
     Connections {
         target: Authorization_engine
         onLaod_main_page_in_qml: {
@@ -81,4 +82,5 @@ Rectangle{
             console.log("create MainPage.qml");
         }
     }
+
 }

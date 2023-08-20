@@ -11,15 +11,16 @@
 #include <QStringList>
 #include <QStringListModel>
 #include <QQuickView>
+
 Q_IMPORT_QML_PLUGIN(Qml_StyleSettingsPlugin)
 Q_IMPORT_QML_PLUGIN(Qml_PagesPlugin)
+
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    MainPageModel data;
-
-
+    // Settings of aplication
     std::string Client_ID = "56152a60d2e04db59842338858c20449";
     std::string requirements = "esi-wallet.read_character_wallet.v1 esi-characters.read_blueprints.v1 publicData";
 
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
         }, Qt::QueuedConnection);
     //engine.rootContext()->setContextObject(A_eng);
     engine.rootContext()->setContextProperty("Authorization_engine", A_eng);
+    qDebug() << "main.cpp : " << A_eng->getModel_ptr().get();
     engine.rootContext()->setContextProperty("MainPageModel", A_eng->getModel_ptr().get());
 
     engine.load(url);

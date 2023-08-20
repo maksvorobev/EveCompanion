@@ -13,7 +13,8 @@ Drawer {
     id: root
     width: 0.66 * main_page.width
     height: main_page.height
-    visible: true
+    //opened: false
+    visible: false
     Label {
         text: "Content goes here!"
         anchors.centerIn: parent
@@ -31,7 +32,7 @@ Drawer {
             //color: Material.background
 
         }
-        DrawerModel{
+        DrawerModel {
             id: drawerModel
         }
 

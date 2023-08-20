@@ -13,7 +13,9 @@
 #include "../../cppModels/include/MainPageModel.h"
 #include "Authorization_engine.h"
 #include <QEventLoop>
-#include "../../RestRequestManager/include/RestRequestManager.h"
+#include "../../RestRequestManager/include/RestRequestManagerWithoutAuth.h"
+#include "../../RestRequestManager/include/RestRequestManagerWithAuth.h"
+#include<unistd.h>
 
 
 class Authorization_engine;
@@ -38,5 +40,9 @@ private:
     QScopedPointer<QSettings> storage;
     QSharedPointer<MainPageModel> model_ptr;
     void fill_data_for_MainPageModelData();
+    std::vector<MainPageModelData> m_data; // data for MainPageModel model
+    std::vector<std::string> ids;
+protected slots:
+    void receive_data_urls(std::vector<std::string> data);
 };
 

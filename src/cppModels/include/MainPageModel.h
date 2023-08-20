@@ -18,6 +18,8 @@ public:
 
 
     std::vector<MainPageModelData> m_data;
+signals:
+    void test_sig(int x);
 
 private:
     enum MainPageRoles{

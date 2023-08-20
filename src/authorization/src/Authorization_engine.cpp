@@ -12,11 +12,12 @@ Authorization_engine::Authorization_engine(
     )
     : QObject{parent},
     Client_ID(Client_ID),
-    requirements(requirements)
+    requirements(requirements),
+    manager(QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(this))),
+    user_data_handler(new User_data_handler(manager))
 {
-    user_data_handler = new User_data_handler(manager);
+
     Code_verifier = generateCodeVerifier();
-    //qDebug() << "Code_verifier = " << Code_verifier;
     codeChallenge = QString(createCodeChallenge(Code_verifier));
 }
 
@@ -64,18 +65,21 @@ void Authorization_engine::POST_request_for_token(const QUrl &url)
     postData.append("&client_id=" + Client_ID.toUtf8());
     postData.append("&code_verifier=" + QByteArray(Code_verifier.constData()));
 
-    QNetworkReply *reply = manager->post(request, postData);
+    manager->post(request, postData);
 
     return;
 }
 
-void Authorization_engine::onSent_user_data_to_handler(const QJsonDocument& JSON_payload, Validating_JWT* parent_of_signal)
+void Authorization_engine::onSent_user_data_to_handler(const QJsonDocument& JSON_payload)
 {
+    disconnect(validating_JWT.get(), &Validating_JWT::Sent_user_data_to_handler,
+               this, &Authorization_engine::onSent_user_data_to_handler);
+
+
+    emit laod_main_page_in_qml();
     user_data_handler->Receive_user_data(JSON_payload);
 
-    disconnect(parent_of_signal, &Validating_JWT::Sent_user_data_to_handler,
-            this, &Authorization_engine::onSent_user_data_to_handler);
-    emit laod_main_page_in_qml();
+    //emit laod_main_page_in_qml();
 
     return;
 }
@@ -136,9 +140,9 @@ void Authorization_engine::get_answer(QNetworkReply *reply)
 
 void Authorization_engine::get_code(QString code)
 {
-        authorization_code = code;
-        POST_request_for_token(POST_URL);
-        return;
+    authorization_code = std::move(code);
+    POST_request_for_token(POST_URL);
+    return;
 
 }
 
@@ -148,10 +152,11 @@ void Authorization_engine::get_POST_RESPONSE_for_token(QNetworkReply *reply)
         qDebug() << reply->errorString();
         qDebug() << reply->error();
         reply->deleteLater();
+        throw std::runtime_error("error with get_POST_RESPONSE_for_token");
         return ;
     }
     auto ans = reply->readAll();
-    QJsonDocument doc = QJsonDocument::fromJson(ans);
+    QJsonDocument doc = QJsonDocument::fromJson(std::move(ans));
     //write_into_QSettings_user_data(doc["access_token"].toString());
 
     /*
@@ -167,7 +172,8 @@ void Authorization_engine::get_POST_RESPONSE_for_token(QNetworkReply *reply)
 
     //Auth_user_data user_data = {"", "", doc["access_token"].toString(), doc["refresh_token"].toString()};
     //list_of_users.push_back(user_data);
-    Validating_JWT* validating_JWT= new Validating_JWT(manager, doc, this);
+    qDebug() << doc;
+    validating_JWT.reset(new Validating_JWT(manager, std::move(doc), this));
 
 
     //QNetworkAccessManager* manager2 = new QNetworkAccessManager();

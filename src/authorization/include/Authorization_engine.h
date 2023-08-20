@@ -28,13 +28,16 @@ class Authorization_engine : public QObject
     Q_PROPERTY(QString p_Direct_URL READ p_Direct_URL CONSTANT)
 
 public:
-    explicit Authorization_engine(
+    Authorization_engine(
         QString Client_ID,
         QString requirements,
         QObject *parent = nullptr
         );
+
+    QSharedPointer<QNetworkAccessManager> manager;
 private:
-    User_data_handler* user_data_handler;
+    QScopedPointer<User_data_handler> user_data_handler;
+    QScopedPointer<Validating_JWT> validating_JWT;
     QString Client_ID;
     QUrl Callback_URL = QString("http://localhost:8080/oauth-callback");
     QString requirements;
@@ -52,7 +55,6 @@ private:
     QByteArray createCodeChallenge(const QByteArray& Code_verifier);
 
 public:
-    QSharedPointer<QNetworkAccessManager> manager = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(this));
     QString p_Direct_URL();
     //User_data_handler* get_User_data_handler();
     QSharedPointer<MainPageModel> getModel_ptr() const;
@@ -61,7 +63,7 @@ signals:
 
 public slots:
     void get_code(QString code);
-    void onSent_user_data_to_handler(const QJsonDocument& JSON_payload, Validating_JWT* parent_of_signal);
+    void onSent_user_data_to_handler(const QJsonDocument& JSON_payload);
 protected slots:
     void get_answer(QNetworkReply *reply);
     void get_POST_RESPONSE_for_token(QNetworkReply *reply);

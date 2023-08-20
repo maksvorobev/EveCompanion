@@ -3,8 +3,10 @@ project(RestRequestManager)
 
 target_sources(appEveCompanion
     PRIVATE
-        include/RestRequestManager.h
-        src/RestRequestManager.cpp
+        include/RestRequestManagerWithoutAuth.h
+        src/RestRequestManagerWithoutAuth.cpp
+        include/RestRequestManagerWithAuth.h
+        src/RestRequestManagerWithAuth.cpp
 )
 
 target_include_directories(appEveCompanion

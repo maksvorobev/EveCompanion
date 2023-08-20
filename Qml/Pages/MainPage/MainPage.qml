@@ -39,7 +39,13 @@ Page {
         DrawerMainPage{
             id: drawerMainPage
         }
-
+        Connections{
+            target: MainPageModel
+            onTest_sig: (x) => {
+                console.log("Main Page View receive data!")
+                console.log(x)
+            }
+        }
 
         ListView{
             id: listView
@@ -56,13 +62,17 @@ Page {
                 anchors.right: parent.right
                 height: 64
                 color: "green"
+
                 Row{
                     anchors.fill: parent
+
                     Image {
                         id: character_img
                         source: model.image_url
                     }
+
                     Text{
+                        color: Material.foreground
                         text: model.name + "wallet: " + model.wallet_balance
                     }
                 }
@@ -75,5 +85,8 @@ Page {
 
         }
 
+    }
+    Component.onCompleted: {
+        console.log("Main Page laod end")
     }
 }
