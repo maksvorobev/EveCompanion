@@ -18,9 +18,11 @@
 #include "Auth_user_data.h"
 #include "User_data_handler.h"
 #include <QScopedPointer>
+#include "../../RefreshingTokens/include/Refresh_Manager.h"
 
 class Validating_JWT;
 class User_data_handler;
+class Refresh_Manager;
 
 class Authorization_engine : public QObject
 {
@@ -36,6 +38,7 @@ public:
 
     QSharedPointer<QNetworkAccessManager> manager;
 private:
+    //QScopedPointer<Refresh_Manager> refresh_Manager;
     QScopedPointer<User_data_handler> user_data_handler;
     QScopedPointer<Validating_JWT> validating_JWT;
     QString Client_ID;

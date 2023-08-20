@@ -19,6 +19,7 @@ Authorization_engine::Authorization_engine(
 
     Code_verifier = generateCodeVerifier();
     codeChallenge = QString(createCodeChallenge(Code_verifier));
+    //refresh_Manager = QScopedPointer<Refresh_Manager>(new Refresh_Manager());
 }
 
 QString Authorization_engine::percent_encoding(const QString& param)

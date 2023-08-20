@@ -7,6 +7,8 @@ target_sources(appEveCompanion
         src/RestRequestManagerWithoutAuth.cpp
         include/RestRequestManagerWithAuth.h
         src/RestRequestManagerWithAuth.cpp
+        src/RefreshTokenSeveralPostRequest.cpp
+        include/RefreshTokenSeveralPostRequest.h
 )
 
 target_include_directories(appEveCompanion

@@ -16,7 +16,7 @@
 #include "../../RestRequestManager/include/RestRequestManagerWithoutAuth.h"
 #include "../../RestRequestManager/include/RestRequestManagerWithAuth.h"
 #include<unistd.h>
-
+#include <map>
 
 class Authorization_engine;
 
@@ -31,7 +31,7 @@ public:
     void Receive_user_data(const QJsonDocument& JSON_payload);
     void store_data(const ns_data::Auth_user_data& data);
     QSharedPointer<MainPageModel> getModel_ptr() const;
-
+    std::map<std::string, std::string> get_refresh_tokens();
 signals:
     void pushSecondPage();
 

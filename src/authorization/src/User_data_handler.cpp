@@ -55,6 +55,19 @@ QSharedPointer<MainPageModel> User_data_handler::getModel_ptr() const
     return model_ptr;
 }
 
+std::map<std::string, std::string> User_data_handler::get_refresh_tokens()
+{
+    /*
+     * Return map as {id : refresh_token, ...}
+     */
+    std::map<std::string, std::string> refresh_tokens;
+    for (const auto& user_id : storage->allKeys()){
+        json j = json::parse(storage->value(user_id).toString().toStdString());
+        refresh_tokens[user_id.toStdString()] = std::move(j["refresh_token"]);
+    }
+    return std::move(refresh_tokens);
+}
+
 void User_data_handler::fill_data_for_MainPageModelData()
 {
     /*
