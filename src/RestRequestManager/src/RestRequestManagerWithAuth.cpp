@@ -23,7 +23,6 @@ Synch_GET_request_in_loop_whith_auth::Synch_GET_request_in_loop_whith_auth(
 
 void Synch_GET_request_in_loop_whith_auth::onFinished(QNetworkReply* reply)
 {
-    qDebug() << "xxxxxx";
     disconnect(manager.get(), &QNetworkAccessManager::finished, this, &Synch_GET_request_in_loop_whith_auth::onFinished);
         if (reply->error()) {
             qDebug() << reply->errorString();
@@ -31,10 +30,8 @@ void Synch_GET_request_in_loop_whith_auth::onFinished(QNetworkReply* reply)
             throw std::runtime_error(error_message);
             //return;
         }
-        qDebug() << "there is data";
         QString answer = reply->readAll();
 
-        //qDebug() << answer;
         data.push_back(std::move(answer.toStdString()));
         reply->deleteLater();
         ++i;
@@ -43,7 +40,6 @@ void Synch_GET_request_in_loop_whith_auth::onFinished(QNetworkReply* reply)
 
 void Synch_GET_request_in_loop_whith_auth::my_connect()
 {
-        qDebug() << "wwwgerg";
     if(i == number_of_iterations){
             emit data_ready(std::move(data));
         return;
@@ -59,6 +55,5 @@ void Synch_GET_request_in_loop_whith_auth::my_connect()
 
     req.setRawHeader("Authorization", (QString("Bearer ") + QString::fromStdString(std::move(access_token[i]))).toUtf8());
     connect(manager.get(), &QNetworkAccessManager::finished, this, &Synch_GET_request_in_loop_whith_auth::onFinished);
-    qDebug() << "yyyyyyyyyyy";
     manager->get(req);
 }

@@ -18,13 +18,12 @@ signals:
 public:
     RefreshTokenSeveralPostRequest(
         QSharedPointer<QNetworkAccessManager> manager,
-        int number_of_iterations,
-        std::vector<std::string> refresh_tokens,
         std::string scope,
         std::string error_message,
         std::string application_client_ID
         );
     QSharedPointer<QNetworkAccessManager> manager;
+    void set_up(int number_of_iterations, std::vector<std::string> refresh_tokens);
     void my_connect();
 public slots:
     void onFinished(QNetworkReply* reply);

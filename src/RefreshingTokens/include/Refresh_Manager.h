@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include <QTimer>
-#include "../../authorization/include/User_data_handler.h"
+#include "../../authorization/include/Authorization_engine.h"
 #include "../../RestRequestManager/include/RefreshTokenSeveralPostRequest.h"
 
 class Authorization_engine;
@@ -13,22 +13,24 @@ class Refresh_Manager: public QObject
     Q_OBJECT
 public:
     Refresh_Manager(
-        QSharedPointer<User_data_handler> user_data_handler,
-        QSharedPointer<QNetworkAccessManager> manager,
-        int number_of_iterations,
-        std::vector<std::string> refresh_tokens,
+        QSharedPointer<Authorization_engine> m_authorization_engine,
         std::string scope,
         std::string error_message,
         std::string _application_client_ID
         );
 
-
+    bool timer_is_work();
+    void set_up_for_refreshing();
 private:
     QTimer timer;
-    QScopedPointer<RefreshTokenSeveralPostRequest> refersh_manager;
-    QSharedPointer<User_data_handler> user_data_handler;
-protected slots:
+    QScopedPointer<RefreshTokenSeveralPostRequest> post_req_manager;
+    QSharedPointer<Authorization_engine> m_authorization_engine;
+    std::map<std::string, std::string> mp_id_refreshTocken;
+
+
+public slots:
     void start_refreshing();
     void stop_refreshing();
+
 };
 

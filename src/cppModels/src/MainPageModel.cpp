@@ -65,17 +65,24 @@ void MainPageModel::addData(MainPageModelData x)
      * Update FULL range of m_data !!!
      */
     //m_data.swap(x);
+
     int row = m_data.size();
     beginInsertRows( QModelIndex(), row, row );
 
     m_data.push_back(x);
 
     endInsertRows();
+
+
+
+
+    qDebug() << "MainPageModel::addData func : save next data below:";
+    get_model_data();
     qDebug() << "m_data.size() = "  << m_data.size();
     //qDebug() << "ptr = " << this;
     int i =0;
-    qDebug() << QString::fromStdString(m_data[i].name) << QString::fromStdString(m_data[i].image_url) << QString::fromStdString(m_data[i].wallet_balance);
-    qDebug() << "emit signal dataChanged from c++ to qml ListView";
+    //qDebug() << QString::fromStdString(m_data[i].name) << QString::fromStdString(m_data[i].image_url) << QString::fromStdString(m_data[i].wallet_balance);
+    //qDebug() << "emit signal dataChanged from c++ to qml ListView";
     //emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
     emit test_sig(m_data.size());
     return;

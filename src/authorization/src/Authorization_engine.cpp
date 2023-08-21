@@ -14,12 +14,37 @@ Authorization_engine::Authorization_engine(
     Client_ID(Client_ID),
     requirements(requirements),
     manager(QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(this))),
-    user_data_handler(new User_data_handler(manager))
+    user_data_handler(new User_data_handler(manager, this))
 {
 
     Code_verifier = generateCodeVerifier();
     codeChallenge = QString(createCodeChallenge(Code_verifier));
-    //refresh_Manager = QScopedPointer<Refresh_Manager>(new Refresh_Manager());
+
+
+    m_refresh_Manager = QSharedPointer<Refresh_Manager>( new Refresh_Manager(
+        QSharedPointer<Authorization_engine> (this),
+        requirements.toStdString(),
+        "error with refreshing tokens",
+        Client_ID.toStdString()
+
+    ));
+
+}
+
+QSharedPointer<Validating_JWT> Authorization_engine::getValidating_JWT() const
+{
+    return validating_JWT;
+}
+
+
+QSharedPointer<User_data_handler> Authorization_engine::getUser_data_handler() const
+{
+    return user_data_handler;
+}
+
+QSharedPointer<Refresh_Manager> Authorization_engine::get_refresh_Manager() const
+{
+    return m_refresh_Manager;
 }
 
 QString Authorization_engine::percent_encoding(const QString& param)
@@ -76,11 +101,13 @@ void Authorization_engine::onSent_user_data_to_handler(const QJsonDocument& JSON
     disconnect(validating_JWT.get(), &Validating_JWT::Sent_user_data_to_handler,
                this, &Authorization_engine::onSent_user_data_to_handler);
 
-
-    emit laod_main_page_in_qml();
+    // TODO
+    qDebug() << "user_data_handler->count_of_characters()  = " << user_data_handler->count_of_characters();
+    if (user_data_handler->count_of_characters() == 0){
+        emit laod_main_page_in_qml();
+    }
     user_data_handler->Receive_user_data(JSON_payload);
 
-    //emit laod_main_page_in_qml();
 
     return;
 }
@@ -174,8 +201,8 @@ void Authorization_engine::get_POST_RESPONSE_for_token(QNetworkReply *reply)
     //Auth_user_data user_data = {"", "", doc["access_token"].toString(), doc["refresh_token"].toString()};
     //list_of_users.push_back(user_data);
     qDebug() << doc;
-    validating_JWT.reset(new Validating_JWT(manager, std::move(doc), this));
-
+    validating_JWT.reset(new Validating_JWT(manager, this));
+    validating_JWT->start(std::move(doc));
 
     //QNetworkAccessManager* manager2 = new QNetworkAccessManager();
     //QNetworkRequest request(QUrl("https://esi.evetech.net/latest/characters/2114312667/portrait/"));

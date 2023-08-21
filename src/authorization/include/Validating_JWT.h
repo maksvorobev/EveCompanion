@@ -22,7 +22,8 @@ class Validating_JWT: public QObject
 {
     Q_OBJECT
 public:
-    Validating_JWT(QSharedPointer<QNetworkAccessManager> manager, QJsonDocument JSON_payload, Authorization_engine* auth_engine);
+    Validating_JWT(QSharedPointer<QNetworkAccessManager> manager, Authorization_engine* auth_engine);
+    void start(QJsonDocument _JSON_payload);
 private:
     QJsonDocument JSON_payload;
     Authorization_engine* auth_engine;

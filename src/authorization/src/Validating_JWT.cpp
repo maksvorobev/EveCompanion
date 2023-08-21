@@ -2,14 +2,17 @@
 
 Validating_JWT::Validating_JWT(
     QSharedPointer<QNetworkAccessManager> manager,
-    QJsonDocument _JSON_payload,
     Authorization_engine* auth_engine
     ):
     manager(manager),
-    JSON_payload(std::move(_JSON_payload)),
     auth_engine(auth_engine)
 {
 
+}
+
+void Validating_JWT::start(QJsonDocument _JSON_payload)
+{
+    JSON_payload = std::move(_JSON_payload);
     access_token = JSON_payload["access_token"].toString();
     send_GET_request_to_SSO_key_storage();
 }

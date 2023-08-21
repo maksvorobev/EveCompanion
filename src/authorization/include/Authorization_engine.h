@@ -38,9 +38,9 @@ public:
 
     QSharedPointer<QNetworkAccessManager> manager;
 private:
-    //QScopedPointer<Refresh_Manager> refresh_Manager;
-    QScopedPointer<User_data_handler> user_data_handler;
-    QScopedPointer<Validating_JWT> validating_JWT;
+    QSharedPointer<Refresh_Manager> m_refresh_Manager;
+    QSharedPointer<User_data_handler> user_data_handler;
+    QSharedPointer<Validating_JWT> validating_JWT;
     QString Client_ID;
     QUrl Callback_URL = QString("http://localhost:8080/oauth-callback");
     QString requirements;
@@ -61,6 +61,13 @@ public:
     QString p_Direct_URL();
     //User_data_handler* get_User_data_handler();
     QSharedPointer<MainPageModel> getModel_ptr() const;
+    QSharedPointer<Refresh_Manager> get_refresh_Manager() const;
+
+    QSharedPointer<User_data_handler> getUser_data_handler() const;
+
+    QSharedPointer<Validating_JWT> getValidating_JWT() const;
+
+
 signals:
     void laod_main_page_in_qml();
 

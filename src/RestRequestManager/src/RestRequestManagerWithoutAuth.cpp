@@ -20,7 +20,6 @@ Synch_GET_request_in_loop_whithout_auth::Synch_GET_request_in_loop_whithout_auth
 
 void Synch_GET_request_in_loop_whithout_auth::onFinished(QNetworkReply* reply)
 {
-    qDebug() << "xxxxxx";
     disconnect(manager.get(), &QNetworkAccessManager::finished, this, &Synch_GET_request_in_loop_whithout_auth::onFinished);
         if (reply->error()) {
             qDebug() << reply->errorString();
@@ -28,10 +27,8 @@ void Synch_GET_request_in_loop_whithout_auth::onFinished(QNetworkReply* reply)
             throw std::runtime_error(error_message);
             //return;
         }
-        qDebug() << "there is data";
         QString answer = reply->readAll();
 
-        //qDebug() << answer;
         data.push_back(std::move(answer.toStdString()));
         reply->deleteLater();
         ++i;
@@ -40,7 +37,6 @@ void Synch_GET_request_in_loop_whithout_auth::onFinished(QNetworkReply* reply)
 
 void Synch_GET_request_in_loop_whithout_auth::my_connect()
 {
-        qDebug() << "wwwgerg";
     if(i == number_of_iterations){
             emit data_ready(std::move(data));
         return;
@@ -54,13 +50,14 @@ void Synch_GET_request_in_loop_whithout_auth::my_connect()
                     QString("/")
                     ));
 
+    /*
     qDebug() << QUrl(QString("https://esi.evetech.net/latest/characters/") +
                      QString::fromStdString(character_id[i]) +
                      QString("/") +
                      QString::fromStdString(scope) +
                      QString("/")
                      );
+    */
     connect(manager.get(), &QNetworkAccessManager::finished, this, &Synch_GET_request_in_loop_whithout_auth::onFinished);
-    qDebug() << "yyyyyyyyyyy";
     manager->get(req);
 }
