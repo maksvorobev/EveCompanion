@@ -1,82 +1,51 @@
-#ifndef AUTHORIZATION_ENGINE_H
-#define AUTHORIZATION_ENGINE_H
+#pragma once
 
 #include <QObject>
-#include <QUrl>
-#include <string>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QDebug>
-#include <QUrlQuery>
-#include <QRandomGenerator>
-#include <QJsonDocument>
-#include <QUuid>
+#include "AuthorizationUrl.h"
+#include "CastomNetworkAccessManager.h"
+#include "TcpServer.h"
 #include "Validating_JWT.h"
-#include <QSharedPointer>
-#include <vector>
-#include "Auth_user_data.h"
-#include "User_data_handler.h"
-#include <QScopedPointer>
-#include "../../RefreshingTokens/include/Refresh_Manager.h"
-
-class Validating_JWT;
-class User_data_handler;
-class Refresh_Manager;
+#include "AuthUserDataManager.h"
 
 class Authorization_engine : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString p_Direct_URL READ p_Direct_URL CONSTANT)
 
 public:
     Authorization_engine(
-        QString Client_ID,
-        QString requirements,
-        QObject *parent = nullptr
+        QString aplicationId,
+        QString scopes,
+        std::shared_ptr<TcpServer> tcpServer,
+        std::shared_ptr<CastomNetworkAccessManager> manager
         );
 
-    QSharedPointer<QNetworkAccessManager> manager;
+    std::shared_ptr<CastomNetworkAccessManager> manager_;
+    Q_INVOKABLE void startAuthProcess();
 private:
-    QSharedPointer<Refresh_Manager> m_refresh_Manager;
-    QSharedPointer<User_data_handler> user_data_handler;
-    QSharedPointer<Validating_JWT> validating_JWT;
-    QString Client_ID;
-    QUrl Callback_URL = QString("http://localhost:8080/oauth-callback");
-    QString requirements;
-    QUrl POST_URL = QString("https://login.eveonline.com/v2/oauth/token");
-    QByteArray Code_verifier;
-    QUrl Direct_URL = QString("https://login.eveonline.com/v2/oauth/authorize/");
-    QString percent_encoding(const QString& param);
-    QString codeChallenge;
-    QString authorization_code;
+    std::unique_ptr<AuthorizationUrl> authorizationUrl_;
+    std::shared_ptr<TcpServer> tcpServer_;
+    std::unique_ptr<AuthUserDataManager> authUserDataManager_;
 
-    QUrl make_authorization_url();
-    QNetworkReply* GET_request(const QUrl& url);
-    void POST_request_for_token(const QUrl& url);
-    QByteArray generateCodeVerifier();
-    QByteArray createCodeChallenge(const QByteArray& Code_verifier);
+    QString aplicationId_;
+    QUrl callbackUrl_ = QString("http://localhost:8080/oauth-callback");
+    QString scopes_;
+    std::unique_ptr<Validating_JWT> validating_Jwt_;
+
+    QUrl Direct_URL = QString("https://login.eveonline.com/v2/oauth/authorize/");
+
+    void postRequestForToken(const QString& code) const ;
+    void getReplyFromTcpServerAndSendPostRequestForToken() const;
+    void startAuthFlow();
+    void jwtValidation(QJsonDocument jsonPayload) const;
+    void storeAuthUserDataIntoStorage() const;
+
 
 public:
-    QString p_Direct_URL();
-    //User_data_handler* get_User_data_handler();
-    QSharedPointer<MainPageModel> getModel_ptr() const;
-    QSharedPointer<Refresh_Manager> get_refresh_Manager() const;
-
-    QSharedPointer<User_data_handler> getUser_data_handler() const;
-
-    QSharedPointer<Validating_JWT> getValidating_JWT() const;
 
 
-signals:
-    void laod_main_page_in_qml();
+    AuthorizationUrl *authorizationUrl() const;
 
-public slots:
-    void get_code(QString code);
-    void onSent_user_data_to_handler(const QJsonDocument& JSON_payload);
-protected slots:
-    void get_answer(QNetworkReply *reply);
-    void get_POST_RESPONSE_for_token(QNetworkReply *reply);
+
 };
 
-#endif // AUTHORIZATION_ENGINE_H
+

@@ -1,91 +1,94 @@
-#include "User_data_handler.h"
+#include "../include/AuthUserDataManager.h"
+
+#include <QDebug>
+#include <nlohmann/json.hpp>
+#include "../../../third-party-lib/jwt-cpp/jwt-cpp/jwt.h"
+#include "Auth_user_data.h"
 using json = nlohmann::json;
 
-User_data_handler::User_data_handler(QSharedPointer<QNetworkAccessManager> manager, Authorization_engine* ptr) :
-    model_ptr(new MainPageModel),
-    storage(new QSettings("EveCompanion", "maksvorobev")),
-    manager(manager),
-    ptr(ptr)
+
+
+AuthUserDataManager::AuthUserDataManager() :
+    storage_(DataStorage())
 {
-    qDebug() << "create storage, his location: "<<storage->fileName();
-    storage->clear();
+    //qDebug() << "create storage, his location: "<<storage->fileName();
+    //storage_.clear();
 }
 
-void User_data_handler::Receive_user_data(const QJsonDocument& JSON_payload)
+void AuthUserDataManager::storeJsonPayload(const QJsonDocument& JSON_payload)
 {
-    auto access_token = JSON_payload["access_token"].toString();
-    std::string token = access_token.toStdString();
+    /*
+     * Receive and store JSON_payload getting after auth/refresh. Token
+     * must be such as: (https://docs.esi.evetech.net/docs/sso/refreshing_access_tokens.html#sso-response)
+     * {
+     *  "access_token":"MXP...tg2",
+     *  "token_type":"Bearer",
+     *  "expires_in":1200,
+     *  "refresh_token":"gEy...fM0"
+     *  }
+     */
+
+    auto accessToken = JSON_payload["access_token"].toString();
+    std::string token = accessToken.toStdString();
     auto decoded = jwt::decode(std::move(token));
     ns_data::Auth_user_data data = {decoded.get_payload_json()["name"].to_str(),
         QString::fromStdString(decoded.get_payload_json()["sub"].to_str()).split(":")[2].toStdString(),
-        access_token.toStdString(),
+        accessToken.toStdString(),
         JSON_payload["refresh_token"].toString().toStdString()
     };
-    store_data(data);
 
-
-    //Auth_user_data data = {decoded.get_payload_json()["name"], };
-    qDebug() << "Receive_user_data func : below decoding of your JWT token";
-    for (auto& e : decoded.get_header_json())
-        qDebug() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
-    for (auto& e : decoded.get_payload_json())
-        qDebug() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
-    qDebug() << "";
-    qDebug() << "";
-
-
-
-    fill_data_for_MainPageModelData();
-    return;
-}
-
-void User_data_handler::store_data(const ns_data::Auth_user_data &data)
-{
-    json j = data;
-    storage->setValue(QString::fromStdString(j["character_id"]), QString::fromStdString(j.dump()));
+    json j = std::move(data);
+    storage_.setValue(std::move(j["character_id"]), j.dump());
     qDebug() << "store_data func : " << "store key = " <<
         QString::fromStdString(j["character_id"]) <<
         "value = " << QString::fromStdString(j.dump());
 
 
-    //qDebug() << storage->value(QString("2114312667")).toString();
-    //qDebug()<<  QString::fromStdString(j.dump());
 
+    //fill_data_for_MainPageModelData();
     return;
 }
 
+
+
+/*
 QSharedPointer<MainPageModel> User_data_handler::getModel_ptr() const
 {
     return model_ptr;
 }
+*/
 
-std::map<std::string, std::string> User_data_handler::get_refresh_tokens()
+
+std::map<std::string, std::string> AuthUserDataManager::getMapIdRefreshToken() const
 {
+
     /*
      * Return map as {id : refresh_token, ...}
-     */
-    std::map<std::string, std::string> refresh_tokens;
-    for (const auto& user_id : storage->allKeys()){
-        json j = json::parse(storage->value(user_id).toString().toStdString());
-        refresh_tokens[user_id.toStdString()] = std::move(j["refresh_token"]);
+     *
+    */
+    std::map<std::string, std::string> map;
+    for (const auto& user_id : storage_.allKeys()){
+        json j = json::parse(storage_[user_id]);
+        map[user_id] = std::move(j["refresh_token"]);
     }
-    return std::move(refresh_tokens);
+    return std::move(map);
 }
 
-int User_data_handler::count_of_characters()
+
+int AuthUserDataManager::countOfCharacters() const
 {
-    return storage->allKeys().size();
+    return storage_.allKeys().size();
 }
 
-void User_data_handler::fill_data_for_MainPageModelData()
-{
+//void User_data_handler::fill_data_for_MainPageModelData()
+//{
     /*
      * Fill m_data in MainPageModel
     */
     //std::vector<MainPageModelData> data_vector;
     //qDebug() <<" test" <<model_ptr->rowCount();
     //qDebug() << "user data";
-
+    /*
     for (const auto& user_id : storage->allKeys()){
         MainPageModelData data_struct;
         json j = json::parse(storage->value(user_id).toString().toStdString());
@@ -96,6 +99,7 @@ void User_data_handler::fill_data_for_MainPageModelData()
         m_data.push_back(std::move(model_data));
         //qDebug() << QString::fromStdString(data_struct.name);
     }
+
     synch_GET = new Synch_GET_request_in_loop_whithout_auth(
         manager,
         storage->allKeys().size(),
@@ -111,7 +115,8 @@ void User_data_handler::fill_data_for_MainPageModelData()
 
     return;
 }
-
+    */
+/*
 void User_data_handler::receive_data_urls(std::vector<std::string> data)
 {
     //qDebug() << "receive_data";
@@ -164,7 +169,7 @@ void User_data_handler::receive_data_urls(std::vector<std::string> data)
         ptr->get_refresh_Manager();
         if (!ptr->get_refresh_Manager()->timer_is_work()){
             //qWarning() << "TIMER ALREADY WORK!!!!";
-            connect(this, &User_data_handler::test, ptr->get_refresh_Manager().get(), &Refresh_Manager::start_refreshing);
+            connect(this, &User_data_handler::test, ptr->get_refresh_Manager().get(), &Refresh_Manager::start_refreshing_tokens);
             emit test();
         }
         qWarning() << "TIMER ALREADY WORK!!!!";
@@ -172,7 +177,7 @@ void User_data_handler::receive_data_urls(std::vector<std::string> data)
     });
     return;
 }
-
+*/
 
 
 

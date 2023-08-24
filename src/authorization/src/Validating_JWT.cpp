@@ -1,11 +1,9 @@
 #include "../include/Validating_JWT.h"
 
 Validating_JWT::Validating_JWT(
-    QSharedPointer<QNetworkAccessManager> manager,
-    Authorization_engine* auth_engine
+    std::shared_ptr<CastomNetworkAccessManager>  manager
     ):
-    manager(manager),
-    auth_engine(auth_engine)
+    manager_(manager)
 {
 
 }
@@ -25,28 +23,26 @@ void Validating_JWT::veri_jwt_token(QString strToken, QString rsa_pub_key)
     */
     std::string token = strToken.toStdString();
 
-
     auto verify = jwt::verify().allow_algorithm(jwt::algorithm::rs256(rsa_pub_key.toStdString(), "", "", "")).with_issuer("login.eveonline.com").with_audience("EVE Online").leeway(5);
     qDebug() << "current unix time : " << (QDateTime::currentMSecsSinceEpoch()/1000);
 
-    qDebug() << QString::fromStdString(token);
+    qInfo() << "It's your access token :\n" << QString::fromStdString(token);
     auto decoded = jwt::decode(std::move(token));
-    qDebug() << "1111111";
-    /*
+
+
+    verify.verify(std::move(decoded)); // there Validate the JWT tocken (signature, issuer, date, audience), if all will valid nothing will happen, else will thow exapthion
+    qInfo() << "Verify JWT token was successful";
+
     qDebug() << "below decoding of your JWT token";
     for (auto& e : decoded.get_header_json())
-        qDebug() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
+        qInfo() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
     for (auto& e : decoded.get_payload_json())
-        qDebug() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
-    qDebug() << "";
-    qDebug() << "";
-    */
-    verify.verify(std::move(decoded)); // there Validate the JWT tocken (signature, issuer, date, audience), if all will valid nothing will happen, else will thow exapthion
+        qInfo() << QString::fromStdString(e.first) << " = " << QString::fromStdString(e.second.to_str());
 
 
-    // there we want store info about user from auth. after valid verify
-    connect(this, &Validating_JWT::Sent_user_data_to_handler,
-            auth_engine, &Authorization_engine::onSent_user_data_to_handler);
+
+    // there is we want store info about user from auth. after valid verify
+
     emit Sent_user_data_to_handler(JSON_payload);
     return;
 
@@ -92,10 +88,10 @@ QString Validating_JWT::ConvertJwkToPem_V2(const QString& nn, const QString& ee)
 
 void Validating_JWT::send_GET_request_to_SSO_key_storage()
 {
-    connect(manager.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
+    connect(manager_.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
     QNetworkRequest req;
     req.setUrl(SSO_key_storage);
-    manager->get(req);
+    manager_->get(req);
     return;
 }
 
@@ -121,7 +117,7 @@ void Validating_JWT::final_check(const QString& ee, const QString& nn)
 
 void Validating_JWT::get_responce_from_SSO_key_storage(QNetworkReply *reply)
 {
-    disconnect(manager.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
+    disconnect(manager_.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
 
     if (reply->error()) {
         qDebug() << reply->errorString();

@@ -20,6 +20,7 @@ RefreshTokenSeveralPostRequest::RefreshTokenSeveralPostRequest(
 void RefreshTokenSeveralPostRequest::set_up(int number_of_iterations, std::vector<std::string> refresh_tokens){
     this->number_of_iterations = number_of_iterations;
     this->refresh_tokens = std::move(refresh_tokens);
+
 }
 
 
@@ -27,7 +28,8 @@ void RefreshTokenSeveralPostRequest::onFinished(QNetworkReply* reply)
 {
     disconnect(manager.get(), &QNetworkAccessManager::finished, this, &RefreshTokenSeveralPostRequest::onFinished);
     if (reply->error()) {
-        qDebug() << reply->errorString();
+
+        qDebug() << reply->error() << reply->readAll();
         //qDebug() << reply->header().toString();
         reply->deleteLater();
         throw std::runtime_error(error_message);
@@ -44,6 +46,7 @@ void RefreshTokenSeveralPostRequest::onFinished(QNetworkReply* reply)
 void RefreshTokenSeveralPostRequest::my_connect()
 {
     if(i == number_of_iterations){
+        i = 0;
         emit data_ready(std::move(ans_data));
         return;
     }

@@ -1,4 +1,6 @@
 #include "../include/Auth_user_data.h"
+
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 

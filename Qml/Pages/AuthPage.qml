@@ -23,6 +23,7 @@ Rectangle{
                 anchors.bottom: parent.bottom
                 button_width: Style.defaultIconWidth
                 button_image_url: main_root.is_dark ?  "data/imgs/left-arrow-white.svg" : "data/imgs/left-arrow-black.svg"
+                /*
                 onClicked:{
                     var component = Qt.createComponent("MainPage/MainPage.qml");
                     if( component.status != Component.Ready )
@@ -34,6 +35,7 @@ Rectangle{
                     component.createObject(root);
                     console.log("create MainPage.qml");
                 }
+                */
             }
         }
 
@@ -61,13 +63,14 @@ Rectangle{
                 anchors.fill : parent
                 onClicked: {
                     console.log("click");
-                    Qt.openUrlExternally(Authorization_engine.p_Direct_URL);
+                    AuthEngine.startAuthProcess();
+                    Qt.openUrlExternally(AuthorizationUrl.authorizationUrl_);
                 }
             }
         }
 
     }
-
+    /*
     Connections {
         target: Authorization_engine
         onLaod_main_page_in_qml: {
@@ -82,5 +85,6 @@ Rectangle{
             console.log("create MainPage.qml");
         }
     }
+    */
 
 }

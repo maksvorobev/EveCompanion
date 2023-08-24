@@ -1,9 +1,8 @@
-#ifndef AUTH_USER_DATA_H
-#define AUTH_USER_DATA_H
+#pragma once
+
 #include <QString>
 #include <nlohmann/json.hpp>
 #include <string>
-using json = nlohmann::json;
 
 namespace ns_data {
 
@@ -22,4 +21,3 @@ void to_json(nlohmann::json& j, const Auth_user_data& p);
 void from_json(const nlohmann::json& j, Auth_user_data& p);
 
 }
-#endif // AUTH_USER_DATA_H

@@ -5,14 +5,20 @@ target_sources(appEveCompanion
     PRIVATE
         include/Authorization_engine.h
         src/Authorization_engine.cpp
-        include/Tcp_server.h
-        src/Tcp_server.cpp
+        include/TcpServer.h
+        src/TcpServer.cpp
         src/Validating_JWT.cpp
         include/Validating_JWT.h
         include/Auth_user_data.h
         src/Auth_user_data.cpp
-        src/User_data_handler.cpp
-        include/User_data_handler.h
+        src/AuthUserDataManager.cpp
+        include/AuthUserDataManager.h
+        include/DataStorage.h
+        src/DataStorage.cpp
+        include/CastomNetworkAccessManager.h
+        src/CastomNetworkAccessManager.cpp
+        src/AuthorizationUrl.cpp
+        include/AuthorizationUrl.h
 )
 
 target_include_directories(appEveCompanion

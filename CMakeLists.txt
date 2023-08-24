@@ -24,6 +24,7 @@ qt_add_qml_module(appEveCompanion
     VERSION 1.0
     QML_FILES Main.qml
     RESOURCE_PREFIX /maksvorobev/imports
+    SOURCES src/Aplication/Aplication.h src/Aplication/Aplication.cpp
 )
 # QML subdirectories
 add_subdirectory(Qml)
