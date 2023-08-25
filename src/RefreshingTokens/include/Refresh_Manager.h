@@ -1,15 +1,15 @@
 #pragma once
 
-#include <QObject>
+
 #include <QTimer>
-#include <QNetworkAccessManager>
+#include "CastomNetworkAccessManager.h"
+#include "AuthUserDataManager.h"
+#include "Validating_JWT.h"
 #include "../../RestRequestManager/include/RefreshTokenSeveralPostRequest.h"
 #include "../../authorization/include/AuthUserDataManager.h"
 #include <memory>
 
-//class Authorization_engine;
-//class User_data_handler;
-//class MainPageModel;
+
 
 class Refresh_Manager: public QObject
 {
@@ -17,29 +17,28 @@ class Refresh_Manager: public QObject
     Q_OBJECT
 public:
     Refresh_Manager(
-        QSharedPointer<QNetworkAccessManager> manager,
-        //QSharedPointer<User_data_handler> m_user_data_handler,
-        //QSharedPointer<Validating_JWT>,
+        std::shared_ptr<CastomNetworkAccessManager> manager,
+        std::shared_ptr<AuthUserDataManager> userDataHandler,
+        std::shared_ptr<Validating_JWT> validatingJwt,
         std::string scope,
         std::string error_message,
         std::string _application_client_ID
         );
 
     bool timer_is_work();
-    void set_up_for_refreshing(std::map<std::string, std::string> mp_id_refreshTocken,
+    void set_up_for_refreshing(const std::map<std::string, std::string>& mp_id_refreshTocken,
                                 int count_of_characters);
 
     void refreshing_process_flow();
 private:
     QTimer timer;
-    std::unique_ptr<RefreshTokenSeveralPostRequest> post_req_manager;
-    QSharedPointer<User_data_handler> m_user_data_handler;
-    QSharedPointer<Validating_JWT> m_validating_JWT;
-    std::map<std::string, std::string> mp_id_refreshTocken;
-    const int time_interval = 10*1000;
+    std::unique_ptr<RefreshTokenSeveralPostRequest> postRreqManager_;
+    std::shared_ptr<AuthUserDataManager> userDataHandler_;
+    std::shared_ptr<Validating_JWT> validatingJwt_;
+    const int time_interval = 18*10*1000;
 
 
-public slots:
+public:
     void start_refreshing_tokens();
     void stop_refreshing();
 

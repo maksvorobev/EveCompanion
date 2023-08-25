@@ -15,6 +15,7 @@
 #include <QDateTime>
 #include <memory>
 #include "CastomNetworkAccessManager.h"
+#include <QMutex>
 
 
 class Validating_JWT: public QObject
@@ -24,6 +25,7 @@ public:
     Validating_JWT(std::shared_ptr<CastomNetworkAccessManager>  manager);
     void start(QJsonDocument _JSON_payload);
 private:
+    QMutex mMutex;
     QJsonDocument JSON_payload;
     QString access_token;
     void extract_nn_and_ee(const QByteArray& answer);

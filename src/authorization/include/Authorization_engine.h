@@ -24,12 +24,12 @@ public:
 private:
     std::unique_ptr<AuthorizationUrl> authorizationUrl_;
     std::shared_ptr<TcpServer> tcpServer_;
-    std::unique_ptr<AuthUserDataManager> authUserDataManager_;
+    std::shared_ptr<AuthUserDataManager> authUserDataManager_;
 
     QString aplicationId_;
     QUrl callbackUrl_ = QString("http://localhost:8080/oauth-callback");
     QString scopes_;
-    std::unique_ptr<Validating_JWT> validating_Jwt_;
+    std::shared_ptr<Validating_JWT> validating_Jwt_;
 
     QUrl Direct_URL = QString("https://login.eveonline.com/v2/oauth/authorize/");
 
@@ -37,7 +37,7 @@ private:
     void getReplyFromTcpServerAndSendPostRequestForToken() const;
     void startAuthFlow();
     void jwtValidation(QJsonDocument jsonPayload) const;
-    void storeAuthUserDataIntoStorage() const;
+    void storeAuthUserDataIntoStorage(const QJsonDocument& JSON_payload) const;
 
 
 public:
@@ -46,6 +46,9 @@ public:
     AuthorizationUrl *authorizationUrl() const;
 
 
+
+    std::shared_ptr<Validating_JWT> validating_Jwt() const;
+    std::shared_ptr<AuthUserDataManager> authUserDataManager() const;
 };
 
 

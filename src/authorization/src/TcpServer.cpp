@@ -15,7 +15,7 @@ void TcpServer::runTcpServer()
     }
     else {
         // TODO
-        qFatal("server dosen't run");
+        qCritical() << "server dosen't run";
         throw std::runtime_error("server dosen't run");
         return;
     }
@@ -33,7 +33,7 @@ void TcpServer::incomingConnection(qintptr socketDescriptor)
 
 void TcpServer::sockReady()
 {
-    //qDebug() <<
+
     auto reply = QString::fromStdString(socket_->readAll().toStdString());
     /*
     QString queryString = QUrl(ans_string).query();

@@ -26,8 +26,8 @@ Authorization_engine::Authorization_engine(
     //manager_ = std::shared_ptr<CastomNetworkAccessManager>(CastomNetworkAccessManager::GetInstance());
     authorizationUrl_ = std::move(std::make_unique<AuthorizationUrl>(callbackUrl_, aplicationId_, scopes_));
     //tcpServer_ = std::move(std::make_unique<TcpServer>());
-    validating_Jwt_ = std::move(std::make_unique<Validating_JWT>(manager_));
-    authUserDataManager_ = std::move(std::make_unique<AuthUserDataManager>());;
+    validating_Jwt_ = std::make_shared<Validating_JWT>(manager_);
+    authUserDataManager_ = std::make_shared<AuthUserDataManager>();
 
     tcpServer_->runTcpServer();
     //startAuthProcess();
@@ -36,7 +36,7 @@ Authorization_engine::Authorization_engine(
 void Authorization_engine::startAuthProcess()
 {
 
-
+    qDebug() << "startAuthProcess";
     authorizationUrl_->MakeAuthorizationUrl();
     qDebug() << "It's your auth url :\n" << authorizationUrl_->authorizationUrl();
 
@@ -44,6 +44,18 @@ void Authorization_engine::startAuthProcess()
 
     startAuthFlow();
 }
+
+std::shared_ptr<AuthUserDataManager> Authorization_engine::authUserDataManager() const
+{
+    return authUserDataManager_;
+}
+
+std::shared_ptr<Validating_JWT> Authorization_engine::validating_Jwt() const
+{
+    return validating_Jwt_;
+}
+
+
 
 void Authorization_engine::postRequestForToken(const QString& code) const
 {
@@ -72,9 +84,18 @@ void Authorization_engine::postRequestForToken(const QString& code) const
         qDebug()  << "It's your jwt payload :\n" << answer;
         QJsonDocument doc = QJsonDocument::fromJson(std::move(answer));
 
-        jwtValidation(std::move(doc));
 
-        storeAuthUserDataIntoStorage();
+
+        QObject *context = new QObject;
+        connect(validating_Jwt_.get(), &Validating_JWT::Sent_user_data_to_handler, context,  [this, context, &doc](const QJsonDocument& JSON_payload){
+            delete context;
+            storeAuthUserDataIntoStorage(doc);
+
+        });
+
+        jwtValidation(doc);
+
+
 
         reply->deleteLater();
 
@@ -114,15 +135,9 @@ void Authorization_engine::jwtValidation(QJsonDocument jsonPayload) const
     validating_Jwt_->start(std::move(jsonPayload));
 }
 
-void Authorization_engine::storeAuthUserDataIntoStorage() const
+void Authorization_engine::storeAuthUserDataIntoStorage(const QJsonDocument& JSON_payload) const
 {
-    QObject *context = new QObject;
-    connect(validating_Jwt_.get(), &Validating_JWT::Sent_user_data_to_handler, context,  [this, context](const QJsonDocument& JSON_payload){
-        delete context;
-
-        authUserDataManager_->storeJsonPayload(JSON_payload);
-
-    });
+    authUserDataManager_->storeJsonPayload(JSON_payload);
 }
 
 AuthorizationUrl *Authorization_engine::authorizationUrl() const

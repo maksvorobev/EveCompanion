@@ -12,7 +12,7 @@ AuthUserDataManager::AuthUserDataManager() :
     storage_(DataStorage())
 {
     //qDebug() << "create storage, his location: "<<storage->fileName();
-    //storage_.clear();
+    storage_.clear();
 }
 
 void AuthUserDataManager::storeJsonPayload(const QJsonDocument& JSON_payload)

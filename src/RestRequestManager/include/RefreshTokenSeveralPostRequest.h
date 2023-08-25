@@ -1,5 +1,6 @@
 #pragma once
-#include <QNetworkAccessManager>
+
+#include "CastomNetworkAccessManager.h"
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QObject>
@@ -17,12 +18,12 @@ signals:
     void data_ready(std::vector<std::string> ans);
 public:
     RefreshTokenSeveralPostRequest(
-        QSharedPointer<QNetworkAccessManager> manager,
+        std::shared_ptr<CastomNetworkAccessManager> manager,
         std::string scope,
         std::string error_message,
         std::string application_client_ID
         );
-    QSharedPointer<QNetworkAccessManager> manager;
+    std::shared_ptr<CastomNetworkAccessManager> manager_;
     void set_up(int number_of_iterations, std::vector<std::string> refresh_tokens);
     void my_connect();
 public slots:

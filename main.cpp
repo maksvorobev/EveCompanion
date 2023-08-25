@@ -16,7 +16,7 @@ Q_IMPORT_QML_PLUGIN(Qml_PagesPlugin)
 
 int main(int argc, char *argv[])
 {
-    //Logger::init();
+    Logger::init();
 
     QGuiApplication app(argc, argv);
 
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
     bool state = app.exec();
 
-    //Logger::clean();
+    Logger::clean();
 
     return state;
 }

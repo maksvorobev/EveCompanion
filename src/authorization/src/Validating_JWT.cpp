@@ -1,5 +1,7 @@
 #include "../include/Validating_JWT.h"
 
+#include <QEventLoop>
+
 Validating_JWT::Validating_JWT(
     std::shared_ptr<CastomNetworkAccessManager>  manager
     ):
@@ -10,9 +12,40 @@ Validating_JWT::Validating_JWT(
 
 void Validating_JWT::start(QJsonDocument _JSON_payload)
 {
+
+    qDebug() << _JSON_payload;
+
     JSON_payload = std::move(_JSON_payload);
     access_token = JSON_payload["access_token"].toString();
+
     send_GET_request_to_SSO_key_storage();
+
+    /*
+    QNetworkAccessManager l_nm;
+    QNetworkRequest req;
+    req.setUrl(SSO_key_storage);
+    QNetworkReply *l_reply = l_nm.get(req);
+    QEventLoop l_event_loop;
+    QObject::connect(l_reply, SIGNAL(finished()), &l_event_loop, SLOT(quit()));
+    l_event_loop.exec();
+
+
+
+    if (l_reply->error()) {
+        //QMutexLocker ml(&mMutex);
+        qDebug() << l_reply->errorString();
+        throw std::runtime_error("error with get_responce_from_SSO_key_storage");
+        l_reply->deleteLater();
+        return;
+    }
+
+    QByteArray answer = l_reply->readAll();
+    qDebug() << answer;
+    // extract nn ee that call ConvertJwkToPem_V2()
+    extract_nn_and_ee(answer);
+    l_reply->deleteLater();
+    */
+
 }
 
 void Validating_JWT::veri_jwt_token(QString strToken, QString rsa_pub_key)
@@ -21,6 +54,7 @@ void Validating_JWT::veri_jwt_token(QString strToken, QString rsa_pub_key)
      * rs 256 jwt token validation
      *
     */
+
     std::string token = strToken.toStdString();
 
     auto verify = jwt::verify().allow_algorithm(jwt::algorithm::rs256(rsa_pub_key.toStdString(), "", "", "")).with_issuer("login.eveonline.com").with_audience("EVE Online").leeway(5);
@@ -88,10 +122,39 @@ QString Validating_JWT::ConvertJwkToPem_V2(const QString& nn, const QString& ee)
 
 void Validating_JWT::send_GET_request_to_SSO_key_storage()
 {
+    /*
+     * old version but not not suitable for loop
     connect(manager_.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
     QNetworkRequest req;
     req.setUrl(SSO_key_storage);
     manager_->get(req);
+    return;
+    */
+
+    // Unfortunately there i make blocking event loop get request, but is's for very simlify (and it's it rarely happens)
+    QNetworkAccessManager l_nm;
+    QNetworkRequest req;
+    req.setUrl(SSO_key_storage);
+    QNetworkReply *l_reply = l_nm.get(req);
+    QEventLoop l_event_loop;
+    QObject::connect(l_reply, SIGNAL(finished()), &l_event_loop, SLOT(quit()));
+    l_event_loop.exec();
+
+
+
+    if (l_reply->error()) {
+
+        qDebug() << l_reply->errorString();
+        throw std::runtime_error("error with get_responce_from_SSO_key_storage");
+        l_reply->deleteLater();
+        return;
+    }
+
+    QByteArray answer = l_reply->readAll();
+    // extract nn ee that call ConvertJwkToPem_V2()
+    extract_nn_and_ee(answer);
+    l_reply->deleteLater();
+
     return;
 }
 
@@ -120,7 +183,8 @@ void Validating_JWT::get_responce_from_SSO_key_storage(QNetworkReply *reply)
     disconnect(manager_.get(), &QNetworkAccessManager::finished, this, &Validating_JWT::get_responce_from_SSO_key_storage);
 
     if (reply->error()) {
-        qDebug() << reply->errorString();
+        //QMutexLocker ml(&mMutex);
+        //qDebug() << reply->errorString();
         throw std::runtime_error("error with get_responce_from_SSO_key_storage");
         reply->deleteLater();
         return;
