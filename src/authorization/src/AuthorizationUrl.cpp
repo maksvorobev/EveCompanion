@@ -4,6 +4,7 @@
 #include <QRandomGenerator>
 #include <QUrlQuery>
 #include <QUuid>
+#include <QDebug>
 
 AuthorizationUrl::AuthorizationUrl(QUrl CallbackUrl, QString AplicationId, QString Scopes)
     :
@@ -15,6 +16,7 @@ AuthorizationUrl::AuthorizationUrl(QUrl CallbackUrl, QString AplicationId, QStri
 
 void AuthorizationUrl::MakeAuthorizationUrl()
 {
+    qDebug() << "make auth url";
     QUrl url = QString("https://login.eveonline.com/v2/oauth/authorize/");
     QUrlQuery q;
     q.addQueryItem(PercentEncoding("response_type"), PercentEncoding("code"));

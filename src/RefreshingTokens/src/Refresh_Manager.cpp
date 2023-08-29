@@ -30,14 +30,13 @@ bool Refresh_Manager::timer_is_work()
 void Refresh_Manager::set_up_for_refreshing(const std::map<std::string, std::string>& mp_id_refreshTocken, int count_of_characters)
 {
 
-
+    qInfo() << "Below id - referesh tken mapping";
     for (auto [l, r] : mp_id_refreshTocken){
-        qInfo() << QString::fromStdString(l) << QString::fromStdString(r);
+        qDebug() << QString::fromStdString(l) << QString::fromStdString(r);
     }
     std::vector<std::string> v ;
 
     for (const auto& [f, s] : mp_id_refreshTocken){
-        qDebug() << "refresh token  = " <<QString::fromStdString(s) ;
         v.push_back(s);
 
     }
@@ -50,16 +49,16 @@ void Refresh_Manager::set_up_for_refreshing(const std::map<std::string, std::str
 
 void Refresh_Manager::start_refreshing_tokens()
 {
-
+    qDebug() << "Starting refresh tokens!\n";
     if (timer.isActive()){
         qWarning() << "refresh token Timer already executed !";
         return;
     }
 
-    //QObject *context = new QObject;
+
     connect(&timer, &QTimer::timeout, [this](){
         //delete context;
-        qDebug() << "finc call - refreshing_process_flow" << "\n";
+        qDebug() << "start refreshing\n";
         refreshing_process_flow();
     });
     timer.start(time_interval);
@@ -74,9 +73,9 @@ void Refresh_Manager::refreshing_process_flow()
     /*
      * Be carefull !!! my_connect() func will executed in other threads !!!
      */
-    qDebug() << "info";
+
     set_up_for_refreshing(userDataHandler_->getMapIdRefreshToken(), userDataHandler_->countOfCharacters());
-    qDebug() << userDataHandler_->countOfCharacters();
+    qDebug() << "count users for refreshing = " << userDataHandler_->countOfCharacters();
 
 
     QObject *context = new QObject;

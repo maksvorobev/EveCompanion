@@ -35,7 +35,7 @@ private:
     std::unique_ptr<RefreshTokenSeveralPostRequest> postRreqManager_;
     std::shared_ptr<AuthUserDataManager> userDataHandler_;
     std::shared_ptr<Validating_JWT> validatingJwt_;
-    const int time_interval = 18*10*1000;
+    const int time_interval = 10*1000;
 
 
 public:

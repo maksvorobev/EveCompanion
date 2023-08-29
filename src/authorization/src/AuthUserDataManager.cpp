@@ -28,6 +28,7 @@ void AuthUserDataManager::storeJsonPayload(const QJsonDocument& JSON_payload)
      *  }
      */
 
+    qDebug() << "Store auth user data into stoage!/n";
     auto accessToken = JSON_payload["access_token"].toString();
     std::string token = accessToken.toStdString();
     auto decoded = jwt::decode(std::move(token));
@@ -45,7 +46,7 @@ void AuthUserDataManager::storeJsonPayload(const QJsonDocument& JSON_payload)
 
 
 
-    //fill_data_for_MainPageModelData();
+
     return;
 }
 

@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     std::string Client_ID = "56152a60d2e04db59842338858c20449";
     std::string requirements = "esi-wallet.read_character_wallet.v1 esi-characters.read_blueprints.v1 publicData";
 
-    qDebug() << 11111;
+    qInfo() << "Aplction is strating!\n\n\n";
 
     Aplication* aplication = new Aplication(
         QString::fromStdString(Client_ID),
@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
     //engine.rootContext()->setContextObject(A_eng);
     engine.rootContext()->setContextProperty("AuthorizationUrl", aplication->authEngine()->authorizationUrl());
     engine.rootContext()->setContextProperty("AuthEngine", aplication->authEngine());
-    //qDebug() << "main.cpp : " << A_eng->getMainPageModel().get();
     //engine.rootContext()->setContextProperty("MainPageModel", A_eng->getMainPageModel().get());
 
     engine.load(url);

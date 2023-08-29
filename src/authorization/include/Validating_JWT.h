@@ -28,11 +28,12 @@ private:
     QMutex mMutex;
     QJsonDocument JSON_payload;
     QString access_token;
+    QByteArray doc_nn_ee_;
     void extract_nn_and_ee(const QByteArray& answer);
     void final_check(const QString& ee, const QString& nn);
     QUrl SSO_key_storage = QUrl("https://login.eveonline.com/oauth/jwks");
     std::shared_ptr<CastomNetworkAccessManager> manager_;
-    void send_GET_request_to_SSO_key_storage();
+    QByteArray send_GET_request_to_SSO_key_storage();
     QString ConvertJwkToPem_V2(const QString& nn, const QString& ee);
     void veri_jwt_token(QString strToken, QString rsa_pub_key);
 

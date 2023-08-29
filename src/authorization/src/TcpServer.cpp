@@ -1,7 +1,6 @@
 #include "../include/TcpServer.h"
 
 TcpServer::TcpServer():
-    /*QTcpServer(),*/
     socket_(new QTcpSocket)
 {
 
@@ -10,12 +9,12 @@ TcpServer::TcpServer():
 void TcpServer::runTcpServer()
 {
     if (listen(QHostAddress::Any, 8080)){
-        qDebug() << "server is starting";
+        qDebug() << "Tcp Server is starting";
         return;
     }
     else {
         // TODO
-        qCritical() << "server dosen't run";
+        qCritical() << "Tcp server dosen't run";
         throw std::runtime_error("server dosen't run");
         return;
     }
@@ -24,6 +23,7 @@ void TcpServer::runTcpServer()
 
 void TcpServer::incomingConnection(qintptr socketDescriptor)
 {
+    qDebug() << "new connection into Tcp server is coming!";
     socket_->setSocketDescriptor(socketDescriptor);
     connect(socket_, &QTcpSocket::readyRead, this, &TcpServer::sockReady);
     connect(socket_, &QTcpSocket::disconnected, this, &TcpServer::sockDisc);

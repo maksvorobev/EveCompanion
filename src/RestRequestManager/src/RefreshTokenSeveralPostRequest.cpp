@@ -74,14 +74,14 @@ void RefreshTokenSeveralPostRequest::my_connect()
     request.setRawHeader("Host", "login.eveonline.com");
     qDebug() << url;
     connect(manager_.get(), &QNetworkAccessManager::finished, this, &RefreshTokenSeveralPostRequest::onFinished);
-    qDebug() << url;
-    qDebug() << "chacking my_connect " <<QString::fromStdString(refresh_tokens.at(i)) << QString::fromStdString(application_client_ID);
+    qDebug() << "old refresh token " <<QString::fromStdString(refresh_tokens.at(i)) <<  "id = " <<QString::fromStdString(application_client_ID);
+
     QByteArray postData; // payload
     postData.append("grant_type=refresh_token");
     postData.append("&refresh_token=" + QString::fromStdString(refresh_tokens[i]).toUtf8());
     postData.append("&client_id=" + QString::fromStdString(application_client_ID).toUtf8());
     //postData.append("&code_verifier=" + QByteArray(Code_verifier.constData()));
-    qInfo() << "wefwfwfw";
+
     auto x  = manager_->post(request, postData);
-    qInfo() << "x = " << x;
+
 }

@@ -36,9 +36,9 @@ Authorization_engine::Authorization_engine(
 void Authorization_engine::startAuthProcess()
 {
 
-    qDebug() << "startAuthProcess";
+    qDebug() << "Starting auth porcess!\n\n\n";
     authorizationUrl_->MakeAuthorizationUrl();
-    qDebug() << "It's your auth url :\n" << authorizationUrl_->authorizationUrl();
+    qDebug() << "It's your auth url :" << authorizationUrl_->authorizationUrl();
 
 
 
